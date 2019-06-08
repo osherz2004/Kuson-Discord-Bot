@@ -1,23 +1,23 @@
+// Import Discord & bot
 const Discord = require('discord.js')
 const client = new Discord.Client()
 
+// Import ytdl-core
+const ytdl = require("ytdl-core")
+const streamOptions = { seek: 0, volume: 1 }
+
+// Import .env
 require('dotenv').config()
 
+// When the bot turned on
 client.on('ready', () => {
-
-    console.log('Connected as ' + client.user.tag);
 
     client.user.setActivity('Porn', {type: 'WATCHING'})
 
-    const generalChannel = client.channels.get('582094422112468994')
-
-    generalChannel.send('התחברתי ישרמוטות')
-
+    // Logs all the server and channels the bot is connected to
     client.guilds.forEach(guild => {
         console.log(guild.name)
-        guild.channels.forEach(channel => {
-            console.log(`- ${channel.name} ${channel.type} ${channel.id}`)
-        })
+        guild.channels.forEach(channel => console.log(`- ${channel.name} ${channel.type} ${channel.id}`))
     })
 })
 
@@ -25,51 +25,49 @@ function randomDamn() {
 
     let n = Math.floor(Math.random() * 10)
     
-    switch (n) {
-        case 0:
-            return "אמא שלך זונה יבן זונה"
-            break
-        case 1:
-            return "יבן שרמוטה אני אזיין אותך"
-            break
-        case 2:
-            return "שתוק יהומו מזדיין אוכל בתחת"
-            break
-        case 3:
-            return "לך תזדיין יבן זונה"
-            break
-        case 4:
-            return "אני מזיין את אמא שלך ואבא שלך זה הצלם יזין"
-            break
-        case 5:
-            return "לאמא הזונה שלך יש כוס בטעם תות"
-            break
-        case 6:
-            return "סתום תפה יהומו"
-            break
-        case 7:
-            return "שתוק יהומו אוכל בתחת"
-            break
-        case 8:
-            return "הדילדו מחכה לך בשירותים יהומו"
-            break
-        case 9:
-            return "לך תמצוץ לכושים יבן זונה"
-    }
+    const arr = [
+        "אמא שלך זונה יבן זונה",
+        "יבן שרמוטה אני אזיין אותך",
+        "שתוק יהומו מזדיין אוכל בתחת",
+        "לך תזדיין יבן זונה",
+        "אני מזיין את אמא שלך ואבא שלך זה הצלם יזין",
+        "לאמא הזונה שלך יש כוס בטעם תות",
+        "סתום תפה יהומו",
+        "שתוק יהומו אוכל בתחת",
+        "הדילדו מחכה לך בשירותים יהומו",
+        "לך תמצוץ לכושים יבן זונה"
+    ]
+
+    return arr[n]
 }
 
-client.on('message', recivedMessage => {
+// When message sent
+client.on('message', message => {
 
-    if (recivedMessage.author == client.user) {
-        return
+    if (message.author == client.user) return
+
+    if (/זונה|זין|זיין|הומו|שרמוטה|גיי|קוקסינל|פאג/.test(message.content)) {
+        message.channel.send(message.author + " " + randomDamn())
     }
 
-    if (/זונה|זין|זיין|הומו|שרמוטה|גיי/.test(recivedMessage.content)) {
-        recivedMessage.channel.send(recivedMessage.author + " " + randomDamn())
-    }
+    if (message.content.includes("מה לשים בתה")) {
 
-    if (recivedMessage.content == 'מה לשים בתה?') {
-        return;
+        if (message.member.voiceChannel) {
+
+            message.member.voiceChannel.join()
+
+            .then(connection => {
+                message.reply("אשכים בתה")
+                const stream = ytdl('https://www.youtube.com/watch?v=gEP-6JNkZtI', { filter: "audioonly" })
+                const dispatcher = connection.playStream(stream, streamOptions)
+                dispatcher.on("end", () => message.member.voiceChannel.leave())
+
+            })
+            .catch(console.log())
+
+        } else {
+            message.reply("תתחבר לקולי כדי שאני אגיד לך מה לשים בתה")
+        }
     }
 
 })
